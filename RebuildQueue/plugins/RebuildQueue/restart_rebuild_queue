@@ -1,0 +1,130 @@
+#!/bin/bash
+#
+# RebuildQueue daemon bootstrap restarter
+# AUTHOR: Jay Allen, http://www.jayallen.org
+# $Id: restart_rebuild_queue 157 2006-12-07 18:10:19Z jallen $
+#
+#    OVERVIEW
+#
+# Some web hosts have a penchant for mercilessly killing the 
+# RebuildQueue daemon.  However, a bug causes RebuildQueue 
+# to sometimes spawn too many children processes when 
+# restarted via cron.
+#
+# This script is a wrapper that restarts the dameon only
+# if needed and has very little impact so it can be run
+# often from your crontab.
+#
+#    INSTALLATION INSTRUCTIONS
+#
+# 1. Install RebuildQueue into your plugins directory
+#    http://code.sixapart.com/svn/mtplugins/trunk/RebuildQueue/
+#
+#    If you've changed the location of your plugins directory
+#    relative to the MT directory or used a different name for
+#    the RebuildQueue directory, you can specify the correct
+#    plugin envelope below.
+
+ENVELOPE="plugins/RebuildQueue"  # Omit trailing slash!
+
+# 2. If you are using RebuildQueue on only one installation
+#    Movable Type, you can pre-assign the MT_HOME variable,
+#    which contains the filesystem path to your
+#    Movable Type directory (without a trailing slash).
+#
+#    (If you are using RebuildQueue for multiple installations
+#    You should skip this step entirely.)
+#
+#    If you know how, the preferred method is to set
+#    the variable in one of your login scripts.  For example,
+#    under the bash shell, you would add the following to your
+#    .bash_profile.
+#
+#       export MT_HOME=$HOME/PATH/TO/MT/DIR/mt
+#
+#    Alternately, you can uncomment the line below and 
+#    define it here.
+
+# MT_HOME=/PATH/TO/MT_HOME    # Omit trailing slash!
+
+# 3. RebuildQueue will output its progress during execution.
+#    If you'd like to save this output you can specify the 
+#    file below.  The directory containing the file MUST be
+#    writeable by the webserver, at least for the first run
+#    so that the file can be created.  After that, only the
+#    file must be writeable by the webserver.
+#
+#    If you wish to discard the output, comment out the line
+#    below or remove the quoted value.
+
+RQLOG="$MT_HOME/$ENVELOPE/RebuildQueue.log"
+
+
+# 4. ADVANCED: If you know what you're doing, you can
+#    customize the command line execution of the daemon
+#    to include other arguments if you like.  Please see the
+#    RebuildQueue documentation before modifying this setting.
+#    In most cases, the default is perfectly fine.
+
+RQCOMMAND="RebuildQueue.pl -daemonize"
+
+# 5. Place this script somewhere on the server and make
+#    it executable by you (i.e. chmod 700).  You can run it
+#    straight from the RebuildQueue plugin directory if you 
+#    like.
+#
+#
+# 6. Place the following line into your crontab replacing 
+#    "/PATH/TO" with the appropriate path from step 5.
+#
+#    */5 * * * * /PATH/TO/restart_rebuild_queue > /dev/null
+#
+#    If you are using RebuildQueue for more than one installation
+#    you need to set the MT_HOME variable in your crontab line.
+#    You can remove the backslash at the end of the first line
+#    and put it all on one line if you like.
+# 
+#    */5 * * * * export MT_HOME=~/PATH/TO/MT/DIR; \
+#                /PATH/TO/restart_rebuild_queue > /dev/null
+#
+#  That's it!  This script will be executed every five minutes 
+#  to make sure that the RebuildQueue daemon is running.  If it 
+#  is not, it will be restarted!
+
+if [ ! "$MT_HOME" ]; then
+    echo 'MT_HOME environment variable is not set'
+    exit
+fi
+
+function rebuildqueue() {
+    PROCESS=`ps -Af | egrep RebuildQueue | egrep -v '(egrep|tail|emacs|vi )'`
+    if [ "$PROCESS" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+rebuildqueue
+if [ "$?" == 1 ]; then
+    echo 'RebuildQueue daemon is already running...'
+    exit
+fi
+
+# Start the RebuildQueue daemon
+echo 'Restarting daemon'
+cd $MT_HOME/$ENVELOPE
+if [ "$RQLOG" ]; then
+    nohup nice -n 15 ./$RQCOMMAND >> $RQLOG &
+else
+    nohup nice -n 15 ./$RQCOMMAND > /dev/null &
+fi
+sleep 2
+
+# Test for a running daemon process
+rebuildqueue
+if [ "$?" == 1 ]; then
+    echo 'RebuildQueue daemon has been restarted...'
+else
+    echo "Couldn't restart RebuildQueue daemon for an unknown reason.  Please try again."
+fi

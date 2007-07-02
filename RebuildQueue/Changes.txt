@@ -1,0 +1,50 @@
+Version 1.06 - May 14, 2007
+
+* Bug fixes
+
+Version 1.05 - May 5, 2007
+
+* Added RebuildQueue-List.pl, which exposes the pages in the Queue through 
+  a filterable interface
+
+Version 1.04 - January 16, 2007
+
+* Fixed a bug that affected rebuilds of date-based archives (thanks to
+  David Raynes for tracking this one down).
+
+Version 1.03 - August 31, 2006
+
+* Fixed a bug related to syncing uploaded files.
+
+Version 1.02 - August 16, 2006
+
+* Added '-load' parameter for RebuildQueue.pl script to define how many
+  queue items at most to process for a given rebuild set (default is now
+  10; previously this was a constant of 1000).
+* Improved rules for bypassing rebuild queue during save/rebuild of
+  templates or forced site rebuilds.
+* Improved selection and sorting of queued items (sorts by priority then by
+  time placed in the queue).
+
+Version 1.01 - August 15, 2006
+
+* Added support for comma-delimited IDs for RebuildQueue.pl's worker
+  parameter.
+* RebuildQueue 'sync' mode can now be daemonized (with support for sleep
+  parameter).
+* RebuildQueue now handles synchronization for files uploaded through
+  MT interface ("Upload File").
+* Number of workers can be configured beyond the arbitrary limit of 10
+  (configure for 10 and save to have the limit increased).
+* Added system configuration option for syncing (if you don't sync, you
+  can leave this option unchecked).
+* Queued items are now assigned a default priority that gives preference
+  to building of permalinked pages, then main indexes, then dated archives,
+  then category archives, then everything else.
+* Cleaned up RebuildQueue::Plugin a bit and added some POD documentation
+  on how queue items can be manipulated by another plugin to better
+  tune prioritization and scheduling of builds.
+
+Version 1.0 - August 12, 2006
+
+* Initial release.

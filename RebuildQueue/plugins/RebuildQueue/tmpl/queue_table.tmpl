@@ -1,0 +1,25 @@
+<div class="list" id="selector">
+<table cellspacing="0" class="compact">
+<thead>
+<tr>
+<th class="cb"><input type="checkbox" name="id-head" value="all" class="select" /></th>
+<th id="rq-priority"><MT_TRANS phrase="URL"></th>
+<th id="rq-title"><MT_TRANS phrase="Type"></th>
+<th id="rq-date"><MT_TRANS phrase="Rebuilt On"></th>
+<th id="rq-date"><MT_TRANS phrase="Worker ID"></th>
+</tr>
+</thead>
+<tbody>
+<TMPL_LOOP NAME=QUEUELOOP>
+<tr class="<TMPL_IF __ODD__>odd<TMPL_ELSE>even</TMPL_IF>">
+<td class="cb">
+<input type="checkbox" name="id" value="<TMPL_VAR NAME=ID>" class="select" />
+</td>
+<td><a href="<TMPL_VAR NAME="URL">"><TMPL_VAR NAME="URL"></a></td>
+<td><TMPL_VAR NAME="TYPE"></td>
+<td width="170"><TMPL_VAR NAME="BUILD_TIME"></td>
+<td align="center"><TMPL_VAR NAME="WORKER_ID"></td>
+</tr>
+</TMPL_LOOP>
+</tbody></table>
+</div>
