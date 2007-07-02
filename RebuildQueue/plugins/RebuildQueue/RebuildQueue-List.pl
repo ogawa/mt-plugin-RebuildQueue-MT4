@@ -38,17 +38,17 @@ MT->add_plugin($plugin);
 MT->add_plugin_action('blog','../../mt.cgi?__mode=rq_list', "Show rebuild queue for this blog");
 
 
-sub init {
-	my $app = shift;
-	$app->SUPER::init(@_) or return;
-	$app->add_methods(
-		list => \&list,
-		rq_delete => \&rq_delete,
-	);
-	$app->{default_mode} = 'list';
-	$app->{requires_login} = 1;
-	$app;
-}
+#sub init {
+#	my $app = shift;
+#	$app->SUPER::init(@_) or return;
+#	$app->add_methods(
+#		list => \&list,
+#		rq_delete => \&rq_delete,
+#	);
+#	$app->{default_mode} = 'list';
+#	$app->{requires_login} = 1;
+#	$app;
+#}
 
 
 

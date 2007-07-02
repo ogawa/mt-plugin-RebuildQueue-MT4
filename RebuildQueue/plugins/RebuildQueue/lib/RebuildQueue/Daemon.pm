@@ -15,6 +15,7 @@ use MT::FileInfo;
 use MT::Placement;
 use MT::Template::Context;
 use RebuildQueue::Publisher;
+use RebuildQueue::PublisherV4;
 use RebuildQueue::File;
 use Fcntl qw( :DEFAULT :flock );
 use Symbol;
@@ -23,7 +24,8 @@ use Time::HiRes qw(gettimeofday tv_interval);
 sub init {
     my $mt = shift;
     $mt->SUPER::init();
-    $mt->{WeblogPublisher} = new RebuildQueue::Publisher;
+    $mt->{WeblogPublisher} = $mt->version_number < 4 ?
+        new RebuildQueue::Publisher : new RebuildQueue::PublisherV4;
     $mt->config('NoPlacementCache', 1);
     $mt;
 }
